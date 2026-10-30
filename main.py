@@ -11,7 +11,6 @@ from app.core.database import engine, Base
 import app.domain.models
 from app.api.v1.router import api_router
 
-# Logging sozlash
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("app")
 
@@ -29,7 +28,6 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS Middleware (React frontend uchun)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -38,7 +36,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ----------------- Global Exception Handlers -----------------
 
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
@@ -91,7 +88,6 @@ async def generic_exception_handler(request: Request, exc: Exception):
         }
     )
 
-# ----------------- Routerlarni ulash -----------------
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.get("/", tags=["Health"])
