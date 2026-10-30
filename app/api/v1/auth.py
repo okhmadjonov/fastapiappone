@@ -5,7 +5,8 @@ from app.schemas.user_schemas import (
     UserResponseDto, 
     TokenResponseDto, 
     RefreshTokenDto,
-    UserLoginDto
+    UserLoginDto,
+    LogoutDto
 )
 from app.services.user_service import UserService
 from app.services.auth_service import AuthService
@@ -46,5 +47,13 @@ async def refresh_token(
     dto: RefreshTokenDto,
     auth_service: AuthService = Depends(get_auth_service)
 ):
-    """Eski refresh token evaziga yangi Access + Refresh token olish"""
+    """Eski refresh token evaziga yangi Access + Refresh token olish (Database tekshiruvi bilan)"""
     return await auth_service.refresh_access_token(dto.refresh_token)
+
+@router.post("/logout")
+async def logout(
+    dto: LogoutDto,
+    auth_service: AuthService = Depends(get_auth_service)
+):
+    """Foydalanuvchini tizimdan chiqarish (Refresh tokenni bazada bekor qilish)"""
+    return await auth_service.logout(dto.refresh_token)

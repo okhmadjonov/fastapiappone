@@ -34,7 +34,8 @@ class UserService:
             name=dto.name,
             email=dto.email,
             hashed_password=hash_password(dto.password),
-            age=dto.age
+            age=dto.age,
+            role=dto.role
         )
         self.db.add(user)
         await self.db.commit()

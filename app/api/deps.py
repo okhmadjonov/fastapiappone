@@ -6,6 +6,7 @@ from app.core.security import decode_token
 from app.domain.models import User
 from app.services.user_service import UserService
 from app.services.auth_service import AuthService
+from app.services.post_service import PostService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
@@ -15,6 +16,10 @@ def get_user_service(db: AsyncSession = Depends(get_db)) -> UserService:
 def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
     return AuthService(db)
 
+def get_post_service(db: AsyncSession = Depends(get_db)) -> PostService:
+    return PostService(db)
+
+# .NET dagi [Authorize] atributining muqobili:
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
     user_service: UserService = Depends(get_user_service)
@@ -38,3 +43,16 @@ async def get_current_user(
         raise credentials_exception
 
     return user
+
+# .NET dagi [Authorize(Roles = "Admin")] atributining to'liq muqobili:
+class RoleChecker:
+    def __init__(self, allowed_roles: list[str]):
+        self.allowed_roles = allowed_roles
+
+    def __call__(self, user: User = Depends(get_current_user)) -> User:
+        if user.role not in self.allowed_roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Ushbu amalni bajarish uchun ruxsat yetarli emas! Talab qilinadigan rol: {self.allowed_roles}"
+            )
+        return user
